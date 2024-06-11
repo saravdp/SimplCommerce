@@ -1,4 +1,4 @@
-name: CodeQL Analysis for Tag v1.0.0-rc
+name: CodeQL Analysis for Revision 930a233
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
 
 jobs:
   analyze:
-    name: Analyze SimplCommerce at tag v1.0.0-rc
+    name: Analyze SimplCommerce at revision 930a233
     runs-on: ubuntu-latest
 
     steps:
@@ -24,14 +24,14 @@ jobs:
     - name: Autobuild
       run: dotnet build
 
-    - name: Perform CodeQL Analysis for tag v1.0.0-rc
+    - name: Perform CodeQL Analysis for revision 930a233
       run: |
-        git checkout tags/v1.0.0-rc
-        codeql database create db-v1.0.0-rc --language=csharp --source-root=. --command="dotnet build"
-        codeql database analyze db-v1.0.0-rc --format=sarif-latest --output=results-v1.0.0-rc.sarif
+        git checkout 930a233
+        codeql database create db-930a233 --language=csharp --source-root=. --command="dotnet build"
+        codeql database analyze db-930a233 --format=sarif-latest --output=results-930a233.sarif
 
     - name: Upload SARIF Report
       uses: actions/upload-artifact@v2
       with:
-        name: sarif-results-v1.0.0-rc
-        path: results-v1.0.0-rc.sarif
+        name: sarif-results-930a233
+        path: results-930a233.sarif
