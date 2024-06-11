@@ -1,0 +1,37 @@
+name: CodeQL Analysis for Tag v1.0.0-rc
+
+on:
+  push:
+    branches: [ "main" ]  
+  pull_request:
+    branches: [ "main" ]  
+
+
+jobs:
+  analyze:
+    name: Analyze SimplCommerce at tag v1.0.0-rc
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Initialize the CodeQL tools
+      uses: github/codeql-action/init@v2
+      with:
+        languages: csharp
+
+    - name: Autobuild
+      run: dotnet build
+
+    - name: Perform CodeQL Analysis for tag v1.0.0-rc
+      run: |
+        git checkout tags/v1.0.0-rc
+        codeql database create db-v1.0.0-rc --language=csharp --source-root=. --command="dotnet build"
+        codeql database analyze db-v1.0.0-rc --format=sarif-latest --output=results-v1.0.0-rc.sarif
+
+    - name: Upload SARIF Report
+      uses: actions/upload-artifact@v2
+      with:
+        name: sarif-results-v1.0.0-rc
+        path: results-v1.0.0-rc.sarif
