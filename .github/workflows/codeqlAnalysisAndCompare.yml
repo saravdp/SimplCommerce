@@ -51,6 +51,8 @@ jobs:
         run: dotnet build SimplCommerce.sln --configuration Release
 
       - name: Update database
+        env:
+          ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=YourDatabase;User Id=sa;Password=Your_password123;"
         run: dotnet ef database update --project src/SimplCommerce.WebHost
 
       - name: Set up CodeQL
