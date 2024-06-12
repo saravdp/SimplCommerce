@@ -7,8 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
- 
-
   codeql-analysis-930a233:
     name: CodeQL Analysis for Revision 930a233
     runs-on: ubuntu-latest
@@ -30,9 +28,10 @@ jobs:
       uses: github/codeql-action/init@v2
       with:
         languages: csharp
-
+        
     - name: Build the code
       run: |
+        npm run gulp-copy-modules -- --configurationName
         sudo apt-get install -y dotnet-sdk-6.0
         dotnet build SimplCommerce.sln
 
