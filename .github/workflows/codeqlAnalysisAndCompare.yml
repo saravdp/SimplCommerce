@@ -74,7 +74,8 @@ jobs:
 #      run: npm run gulp-copy-modules -- --configurationName Release
       
     - name: Build the code
-      run: dotnet build SimplCommerce.sln --configuration Release
+      run: npm run gulp-copy-modules -- --configurationName 
+           dotnet build SimplCommerce.sln --configuration Release
 
     - name: Update database
       run: dotnet ef database update --project src/SimplCommerce.WebHost
