@@ -16,12 +16,14 @@ jobs:
       with:
         fetch-depth: 0  # Fetch all tags and history
 
-    - name: Fetch commit hash for milestone v1.0.0-rc
-      run: echo "::set-output name=commit::<COMMIT_HASH_FOR_v1.0.0-rc>"
-      id: get-commit
+    - name: Add upstream remote
+      run: git remote add upstream https://github.com/simplcommerce/SimplCommerce.git
 
-    - name: Checkout specific commit
-      run: git checkout ${{ steps.get-commit.outputs.commit }}
+    - name: Fetch tags from upstream
+      run: git fetch --tags upstream
+
+    - name: Checkout specific tag
+      run: git checkout tags/v1.0.0-rc
 
     - name: Initialize submodules
       run: git submodule update --init --recursive
