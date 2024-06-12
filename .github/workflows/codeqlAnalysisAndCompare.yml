@@ -1,0 +1,103 @@
+name: CodeQL Analysis and Compare
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  codeql-analysis-v-rc:
+    name: CodeQL Analysis for Tag v1.0.0-rc
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Git
+      run: git fetch --tags
+
+    - name: Checkout specific tag
+      run: git checkout tags/v1.0.0-rc
+
+    - name: Initialize submodules
+      run: git submodule update --init --recursive
+
+    - name: Set up CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: csharp
+
+    - name: Build the code
+      run: |
+        sudo apt-get install -y dotnet-sdk-6.0
+        dotnet build SimplCommerce.sln
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: tag-v1.0.0-rc
+        upload: true
+
+  codeql-analysis-930a233:
+    name: CodeQL Analysis for Revision 930a233
+    runs-on: ubuntu-latest
+    needs: codeql-analysis-v-rc
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Checkout specific revision
+      run: git checkout 930a233
+
+    - name: Initialize submodules
+      run: git submodule update --init --recursive
+
+    - name: Set up CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: csharp
+
+    - name: Build the code
+      run: |
+        sudo apt-get install -y dotnet-sdk-6.0
+        dotnet build SimplCommerce.sln
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: revision-930a233
+        upload: true
+
+  compare-results:
+    name: Compare CodeQL Analysis Results
+    runs-on: ubuntu-latest
+    needs: codeql-analysis-930a233
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Download SARIF Report for Tag v1.0.0-rc
+      uses: actions/download-artifact@v2
+      with:
+        name: codeql-database/results
+        path: ./results-v1.0.0-rc
+
+    - name: Download SARIF Report for Revision 930a233
+      uses: actions/download-artifact@v2
+      with:
+        name: codeql-database/results
+        path: ./results-930a233
+
+    - name: Install SARIF CLI
+      run: npm install -g sarif
+
+    - name: Compare SARIF Reports
+      run: |
+        sarif diff ./results-v1.0.0-rc/codeql-results.sarif ./results-930a233/codeql-results.sarif > sarif-diff.txt
+
+    - name: Upload Comparison Report
+      uses: actions/upload-artifact@v2
+      with:
+        name: sarif-diff
+        path: sarif-diff.txt
