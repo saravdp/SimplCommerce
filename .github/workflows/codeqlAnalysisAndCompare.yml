@@ -33,13 +33,10 @@ jobs:
       with:
         languages: csharp
 
-    - name: Build the code
+    - name: Run Docker container
       run: |
-        sudo dotnet tool install --global dotnet-ef
-        sudo bash simpl-build.sh
-        # cd src/SimplCommerce.WebHost
-        # sudo apt-get install -y dotnet-sdk-8.0
-        # dotnet run
+        docker run -p 5000:80 simplcommerce/ci-build
+
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
