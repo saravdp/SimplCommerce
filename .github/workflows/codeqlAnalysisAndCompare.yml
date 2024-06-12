@@ -32,8 +32,9 @@ jobs:
 
     - name: Check PATH environment variable
       run: echo $PATH
-    - name: Update database
-      run: ~/.dotnet/tools/dotnet-ef database update --project src/SimplCommerce.WebHost
+      
+ #   - name: Update database
+ #     run: ~/.dotnet/tools/dotnet-ef database update --project src/SimplCommerce.WebHost
 
   #  - name: Run gulp tasks
   #    run: npm run gulp-copy-modules -- --configurationName Release
