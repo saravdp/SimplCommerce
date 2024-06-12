@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['csharp'] # Adjusted to only include C# language
+        language: ['csharp', 'javascript'] # Adjusted to only include C# language
 
     steps:
       - name: Checkout repository
