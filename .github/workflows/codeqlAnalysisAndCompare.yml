@@ -35,11 +35,11 @@ jobs:
 
     - name: Build the code
       run: |
-        sudo dotnet tool install --global dotnet-ef
-        sudo bash simpl-build.sh
-        cd src/SimplCommerce.WebHost
+        # sudo dotnet tool install --global dotnet-ef
+        # sudo bash simpl-build.sh
+        # cd src/SimplCommerce.WebHost
         # sudo apt-get install -y dotnet-sdk-8.0
-        dotnet run
+        # dotnet run
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
