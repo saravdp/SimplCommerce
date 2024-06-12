@@ -7,14 +7,16 @@ on:
   workflow_dispatch:
 
 jobs:
-  codeql-analysis-v-rc:
+  codeql-analysis-v1-rc:
     name: CodeQL Analysis for Tag v1.0.0-rc
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Fetch all tags and history
 
-    - name: Set up Git
+    - name: Fetch tags
       run: git fetch --tags
 
     - name: Checkout specific tag
@@ -42,10 +44,13 @@ jobs:
   codeql-analysis-930a233:
     name: CodeQL Analysis for Revision 930a233
     runs-on: ubuntu-latest
-    needs: codeql-analysis-v-rc
+    needs: codeql-analysis-v1-rc
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+
+    - name: Fetch history for specific revision
+      run: git fetch --prune --unshallow
 
     - name: Checkout specific revision
       run: git checkout 930a233
@@ -80,13 +85,13 @@ jobs:
     - name: Download SARIF Report for Tag v1.0.0-rc
       uses: actions/download-artifact@v2
       with:
-        name: codeql-database/results
+        name: codeql-results
         path: ./results-v1.0.0-rc
 
     - name: Download SARIF Report for Revision 930a233
       uses: actions/download-artifact@v2
       with:
-        name: codeql-database/results
+        name: codeql-results
         path: ./results-930a233
 
     - name: Install SARIF CLI
