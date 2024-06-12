@@ -16,11 +16,11 @@ jobs:
       with:
         fetch-depth: 0  # Fetch all tags and history
 
-    - name: Fetch tags
-      run: git fetch --tags
+    - name: Verify tags
+      run: git tag
 
     - name: Checkout specific tag
-      run: git checkout tags/v1.0.0-rc
+      run: git checkout v1.0.0-rc
 
     - name: Initialize submodules
       run: git submodule update --init --recursive
