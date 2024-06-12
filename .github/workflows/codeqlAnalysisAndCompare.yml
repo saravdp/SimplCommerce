@@ -27,8 +27,8 @@ jobs:
       with:
         node-version: '16.x'
 
-    - name: Install npm dependencies
-      run: npm install
+   # - name: Install npm dependencies
+   #   run: npm install
 
     #  - name: Run gulp tasks
     #    run: npm run gulp-copy-modules -- --configurationName Release
