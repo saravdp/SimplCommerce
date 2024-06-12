@@ -41,7 +41,10 @@ jobs:
 
     - name: Update database
       run: dotnet ef database update --project src/SimplCommerce.WebHost
-
+    
+    - name: install npm dependencies
+      run: npm i
+      
     - name: Set up CodeQL
       uses: github/codeql-action/init@v2
       with:
