@@ -7,8 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  jobs:
-  codeql-analysis-v1.0.0-rc:
+  codeql-analysis-v1-rc:
     name: CodeQL Analysis for Tag v1.0.0-rc
     runs-on: ubuntu-latest
     steps:
@@ -18,7 +17,43 @@ jobs:
           repository: simplcommerce/SimplCommerce
           ref: tags/v1.0.0-rc
 
-      # Add other steps specific to codeql-analysis-v1.0.0-rc...
+      - name: Initialize submodules
+        run: git submodule update --init --recursive
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '8.x'
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Run gulp tasks
+        run: npm run gulp-copy-modules -- --configurationName Release
+
+      - name: Restore dependencies
+        run: dotnet restore SimplCommerce.sln
+
+      - name: Build the code
+        run: dotnet build SimplCommerce.sln --configuration Release
+
+      - name: Update database
+        run: dotnet ef database update --project src/SimplCommerce.WebHost
+
+      - name: Set up CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: csharp
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          upload: true
 
   codeql-analysis-930a233:
     name: CodeQL Analysis for Revision 930a233
@@ -30,12 +65,48 @@ jobs:
           repository: simplcommerce/SimplCommerce
           ref: 930a233
 
-      # Add steps specific to codeql-analysis-930a233...
+      - name: Initialize submodules
+        run: git submodule update --init --recursive
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: '8.x'
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+
+      - name: Install npm dependencies
+        run: npm install
+
+      - name: Run gulp tasks
+        run: npm run gulp-copy-modules -- --configurationName Release
+
+      - name: Restore dependencies
+        run: dotnet restore SimplCommerce.sln
+
+      - name: Build the code
+        run: dotnet build SimplCommerce.sln --configuration Release
+
+      - name: Update database
+        run: dotnet ef database update --project src/SimplCommerce.WebHost
+
+      - name: Set up CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: csharp
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          upload: true
 
   compare-results:
     name: Compare CodeQL Analysis Results
     runs-on: ubuntu-latest
-    needs: [codeql-analysis-v1.0.0-rc, codeql-analysis-930a233]
+    needs: codeql-analysis-930a233
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -64,28 +135,3 @@ jobs:
         with:
           name: sarif-diff
           path: sarif-diff.txt
-
-  build-and-test:
-    name: Build and Test .NET Project
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          repository: simplcommerce/SimplCommerce
-          ref: tags/v1.0.0-rc
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: '6.x' # Adjust the version as needed
-
-      - name: Restore dependencies
-        run: dotnet restore SimplCommerce.sln
-
-      - name: Build the code
-        run: dotnet build SimplCommerce.sln --configuration Release
-
-      # Add additional steps for testing the .NET project...
-
-  t
