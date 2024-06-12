@@ -7,40 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  codeql-analysis-930a233:
-    name: CodeQL Analysis for Revision 930a233
-    runs-on: ubuntu-latest
-    needs: codeql-analysis-v1-rc
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Fetch history for specific revision
-      run: git fetch --prune --unshallow
-
-    - name: Checkout specific revision
-      run: git checkout 930a233
-
-    - name: Initialize submodules
-      run: git submodule update --init --recursive
-
-    - name: Set up CodeQL
-      uses: github/codeql-action/init@v2
-      with:
-        languages: csharp
-        
-    - name: Build the code
-      run: |
-        npm run gulp-copy-modules -- --configurationName
-        sudo apt-get install -y dotnet-sdk-6.0
-        dotnet build SimplCommerce.sln
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
-      with:
-        category: revision-930a233
-        upload: true
-        
   codeql-analysis-v1-rc:
     name: CodeQL Analysis for Tag v1.0.0-rc
     runs-on: ubuntu-latest
@@ -48,16 +14,8 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
-        fetch-depth: 0  # Fetch all tags and history
-
-    - name: Add upstream remote
-      run: git remote add upstream https://github.com/simplcommerce/SimplCommerce.git
-
-    - name: Fetch tags from upstream
-      run: git fetch --tags upstream
-
-    - name: Checkout specific tag
-      run: git checkout tags/v1.0.0-rc
+        repository: simplcommerce/SimplCommerce
+        ref: tags/v1.0.0-rc
 
     - name: Initialize submodules
       run: git submodule update --init --recursive
@@ -65,21 +23,28 @@ jobs:
     - name: Set up .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: '8.0'
+        dotnet-version: '8.x'
+
+    - name: Install Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16.x'
+
+    - name: Install npm dependencies
+      run: npm install
+
+    - name: Run gulp tasks
+      run: npm run gulp-copy-modules -- --configurationName Release
 
     - name: Restore dependencies
       run: dotnet restore SimplCommerce.sln
-    
-#    - name: install npm dependencies
-#      run: npm run gulp-copy-modules -- --configurationName Release
-      
+
     - name: Build the code
-      run: npm run gulp-copy-modules -- --configurationName 
-           dotnet build SimplCommerce.sln --configuration Release
+      run: dotnet build SimplCommerce.sln --configuration Release
 
     - name: Update database
       run: dotnet ef database update --project src/SimplCommerce.WebHost
-      
+
     - name: Set up CodeQL
       uses: github/codeql-action/init@v2
       with:
@@ -89,10 +54,59 @@ jobs:
       uses: github/codeql-action/analyze@v2
       with:
         upload: true
+
+  codeql-analysis-930a233:
+    name: CodeQL Analysis for Revision 930a233
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        repository: simplcommerce/SimplCommerce
+        ref: 930a233
+
+    - name: Initialize submodules
+      run: git submodule update --init --recursive
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.x'
+
+    - name: Install Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16.x'
+
+    - name: Install npm dependencies
+      run: npm install
+
+    - name: Run gulp tasks
+      run: npm run gulp-copy-modules -- --configurationName Release
+
+    - name: Restore dependencies
+      run: dotnet restore SimplCommerce.sln
+
+    - name: Build the code
+      run: dotnet build SimplCommerce.sln --configuration Release
+
+    - name: Update database
+      run: dotnet ef database update --project src/SimplCommerce.WebHost
+
+    - name: Set up CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: csharp
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        upload: true
+
   compare-results:
     name: Compare CodeQL Analysis Results
     runs-on: ubuntu-latest
-    needs: codeql-analysis-930a233
+    needs: [codeql-analysis-v1-rc, codeql-analysis-930a233]
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
