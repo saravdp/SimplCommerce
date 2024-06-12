@@ -53,6 +53,6 @@ jobs:
           languages: csharp
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-        with:
-          upload: true
+        run: |
+          codeql database create --language=csharp --source-root=. --output=codeql-database
+          codeql database analyze --database=codeql-database --output=results.qsarif
