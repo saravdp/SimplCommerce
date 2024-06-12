@@ -16,11 +16,12 @@ jobs:
       with:
         fetch-depth: 0  # Fetch all tags and history
 
-    - name: Verify tags
-      run: git tag
+    - name: Fetch commit hash for milestone v1.0.0-rc
+      run: echo "::set-output name=commit::<COMMIT_HASH_FOR_v1.0.0-rc>"
+      id: get-commit
 
-    - name: Checkout specific tag
-      run: git checkout v1.0.0-rc
+    - name: Checkout specific commit
+      run: git checkout ${{ steps.get-commit.outputs.commit }}
 
     - name: Initialize submodules
       run: git submodule update --init --recursive
