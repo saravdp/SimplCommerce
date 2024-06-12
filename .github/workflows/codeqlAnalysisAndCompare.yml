@@ -35,15 +35,15 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore SimplCommerce.sln
-
+    
+    - name: install npm dependencies
+      run: npm run gulp-copy-modules -- --configurationName Release
+      
     - name: Build the code
       run: dotnet build SimplCommerce.sln --configuration Release
 
     - name: Update database
       run: dotnet ef database update --project src/SimplCommerce.WebHost
-    
-    - name: install npm dependencies
-      run: npm run gulp-copy-modules -- --configurationName Release
       
     - name: Set up CodeQL
       uses: github/codeql-action/init@v2
