@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ['csharp', 'javascript'] # Adjusted to only include C# language
+        language: ['csharp'] # Manually specify C# language
 
     steps:
       - name: Checkout repository
@@ -25,7 +25,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: '8.x' # Reverted back to .NET 8.x version
+          dotnet-version: '8.x'
 
       - name: Install Node.js
         uses: actions/setup-node@v2
@@ -34,9 +34,6 @@ jobs:
 
       - name: Install dotnet-ef tool
         run: dotnet tool install --global dotnet-ef
-
-      - name: Check PATH environment variable
-        run: echo $PATH
 
       - name: Restore dependencies
         run: dotnet restore SimplCommerce.sln
