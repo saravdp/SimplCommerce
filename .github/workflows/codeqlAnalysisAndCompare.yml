@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  codeql-analysis-v1.0.0-rc:
+  codeql-analysis-v1-rc:
     name: CodeQL Analysis for Tag v1.0.0-rc
     runs-on: ubuntu-latest
     steps:
@@ -47,7 +47,7 @@ jobs:
   codeql-analysis-930a233:
     name: CodeQL Analysis for Revision 930a233
     runs-on: ubuntu-latest
-    needs: codeql-analysis-v1.0.0-rc
+    needs: codeql-analysis-v1-rc
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
