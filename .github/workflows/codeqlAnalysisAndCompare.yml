@@ -7,131 +7,117 @@ on:
   workflow_dispatch:
 
 jobs:
+  codeql-analysis-930a233:
+    name: CodeQL Analysis for Revision 930a233
+    runs-on: ubuntu-latest
+    needs: codeql-analysis-v1-rc
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Fetch history for specific revision
+      run: git fetch --prune --unshallow
+
+    - name: Checkout specific revision
+      run: git checkout 930a233
+
+    - name: Initialize submodules
+      run: git submodule update --init --recursive
+
+    - name: Set up CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: csharp
+        
+    - name: Build the code
+      run: |
+        npm run gulp-copy-modules -- --configurationName
+        sudo apt-get install -y dotnet-sdk-6.0
+        dotnet build SimplCommerce.sln
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: revision-930a233
+        upload: true
+        
   codeql-analysis-v1-rc:
     name: CodeQL Analysis for Tag v1.0.0-rc
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          repository: simplcommerce/SimplCommerce
-          ref: tags/v1.0.0-rc
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Fetch all tags and history
 
-      - name: Initialize submodules
-        run: git submodule update --init --recursive
+    - name: Add upstream remote
+      run: git remote add upstream https://github.com/simplcommerce/SimplCommerce.git
 
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: '8.x'
+    - name: Fetch tags from upstream
+      run: git fetch --tags upstream
 
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16.x'
+    - name: Checkout specific tag
+      run: git checkout tags/v1.0.0-rc
 
-      - name: Install npm dependencies
-        run: npm install
+    - name: Initialize submodules
+      run: git submodule update --init --recursive
 
-      - name: Run gulp tasks
-        run: npm run gulp-copy-modules -- --configurationName Release
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: '8.0'
 
-      - name: Restore dependencies
-        run: dotnet restore SimplCommerce.sln
+    - name: Restore dependencies
+      run: dotnet restore SimplCommerce.sln
+    
+#    - name: install npm dependencies
+#      run: npm run gulp-copy-modules -- --configurationName Release
+      
+    - name: Build the code
+      run: npm run gulp-copy-modules -- --configurationName 
+           dotnet build SimplCommerce.sln --configuration Release
 
-      - name: Build the code
-        run: dotnet build SimplCommerce.sln --configuration Release
+    - name: Update database
+      run: dotnet ef database update --project src/SimplCommerce.WebHost
+      
+    - name: Set up CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: csharp
 
-      - name: Update database
-        run: dotnet ef database update --project src/SimplCommerce.WebHost
-
-      - name: Set up CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: csharp
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-        with:
-          upload: true
-
-  codeql-analysis-930a233:
-    name: CodeQL Analysis for Revision 930a233
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-        with:
-          repository: simplcommerce/SimplCommerce
-          ref: 930a233
-
-      - name: Initialize submodules
-        run: git submodule update --init --recursive
-
-      - name: Set up .NET
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: '8.x'
-
-      - name: Install Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16.x'
-
-      - name: Install npm dependencies
-        run: npm install
-
-      - name: Run gulp tasks
-        run: npm run gulp-copy-modules -- --configurationName Release
-
-      - name: Restore dependencies
-        run: dotnet restore SimplCommerce.sln
-
-      - name: Build the code
-        run: dotnet build SimplCommerce.sln --configuration Release
-
-      - name: Update database
-        run: dotnet ef database update --project src/SimplCommerce.WebHost
-
-      - name: Set up CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: csharp
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
-        with:
-          upload: true
-
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        upload: true
   compare-results:
     name: Compare CodeQL Analysis Results
     runs-on: ubuntu-latest
     needs: codeql-analysis-930a233
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Download SARIF Report for Tag v1.0.0-rc
-        uses: actions/download-artifact@v2
-        with:
-          name: codeql-results
-          path: ./results-v1.0.0-rc
+    - name: Download SARIF Report for Tag v1.0.0-rc
+      uses: actions/download-artifact@v2
+      with:
+        name: codeql-results
+        path: ./results-v1.0.0-rc
 
-      - name: Download SARIF Report for Revision 930a233
-        uses: actions/download-artifact@v2
-        with:
-          name: codeql-results
-          path: ./results-930a233
+    - name: Download SARIF Report for Revision 930a233
+      uses: actions/download-artifact@v2
+      with:
+        name: codeql-results
+        path: ./results-930a233
 
-      - name: Install SARIF CLI
-        run: npm install -g sarif
+    - name: Install SARIF CLI
+      run: npm install -g sarif
 
-      - name: Compare SARIF Reports
-        run: |
-          sarif diff ./results-v1.0.0-rc/codeql-results.sarif ./results-930a233/codeql-results.sarif > sarif-diff.txt
+    - name: Compare SARIF Reports
+      run: |
+        sarif diff ./results-v1.0.0-rc/codeql-results.sarif ./results-930a233/codeql-results.sarif > sarif-diff.txt
 
-      - name: Upload Comparison Report
-        uses: actions/upload-artifact@v2
-        with:
-          name: sarif-diff
-          path: sarif-diff.txt
+    - name: Upload Comparison Report
+      uses: actions/upload-artifact@v2
+      with:
+        name: sarif-diff
+        path: sarif-diff.txt
