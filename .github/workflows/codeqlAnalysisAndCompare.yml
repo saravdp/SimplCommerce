@@ -64,6 +64,12 @@ jobs:
         run: dotnet ef database update --project src/SimplCommerce.WebHost
 
       - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v2
+        run: |
+          codeql database create --language=csharp --source-root=. --output=codeql-database
+          codeql database analyze --database=codeql-database --output=results.qsarif
+
+      - name: Upload SARIF results
+        uses: github/codeql-action/upload-sarif@v2
         with:
-          upload: true
+          sarif_file: results.qsarif
+
