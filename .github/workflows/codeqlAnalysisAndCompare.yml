@@ -13,9 +13,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-      with:
-        repository: simplcommerce/SimplCommerce
-        ref: v1.0.0-rc
 
     - name: Initialize submodules
       run: git submodule update --init --recursive
@@ -61,9 +58,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-      with:
-        repository: simplcommerce/SimplCommerce
-        ref: 930a233
 
     - name: Initialize submodules
       run: git submodule update --init --recursive
