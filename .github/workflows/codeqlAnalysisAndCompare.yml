@@ -1,33 +1,6 @@
-name: CodeQL Analysis and Compare
-
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
-
-jobs:
-  codeql-analysis-v1-rc:
-    name: CodeQL Analysis for Tag v1.0.0-rc
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-      with:
-        repository: simplcommerce/SimplCommerce
-        ref: tags/v1.0.0-rc
-
-    - name: Initialize submodules
+- name: Initialize submodules
       run: git submodule update --init --recursive
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'  # Use a specific version of Node.js that is compatible with your project
-
-    - name: Install npm dependencies
-      run: npm install
-      
     - name: Set up CodeQL
       uses: github/codeql-action/init@v2
       with:
@@ -41,55 +14,27 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
       with:
+        category: revision-930a233
         upload: true
 
   compare-results:
     name: Compare CodeQL Analysis Results
     runs-on: ubuntu-latest
-    needs: codeql-analysis-v1-rc
+    needs: codeql-analysis-930a233
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-      with:
-        repository: simplcommerce/SimplCommerce
-        ref: 930a233
-
-    - name: Initialize submodules
-      run: git submodule update --init --recursive
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'  # Use a specific version of Node.js that is compatible with your project
-
-    - name: Install npm dependencies
-      run: npm install
-      
-    - name: Set up CodeQL
-      uses: github/codeql-action/init@v2
-      with:
-        languages: csharp
-
-    - name: Build the code
-      run: |
-        sudo apt-get install -y dotnet-sdk-6.0
-        dotnet build SimplCommerce.sln
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
-      with:
-        upload: true
 
     - name: Download SARIF Report for Tag v1.0.0-rc
       uses: actions/download-artifact@v2
       with:
-        name: codeql-results-v1.0.0-rc
+        name: codeql-results
         path: ./results-v1.0.0-rc
 
     - name: Download SARIF Report for Revision 930a233
       uses: actions/download-artifact@v2
       with:
-        name: codeql-results-930a233
+        name: codeql-results
         path: ./results-930a233
 
     - name: Install SARIF CLI
