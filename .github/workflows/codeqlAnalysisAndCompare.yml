@@ -55,7 +55,7 @@ jobs:
 
       - name: Update database
         env:
-          ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=YourDatabase;User Id=sa;Password=Your_password123;"
+          ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=YourDatabase;User Id=sa;Password=Your_password123;TrustServerCertificate=True;"
         run: dotnet ef database update --project src/SimplCommerce.WebHost
 
       - name: Set up CodeQL
