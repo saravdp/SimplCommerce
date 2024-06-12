@@ -14,10 +14,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Initialize the CodeQL tools
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@v3
       with:
         languages: csharp
 
@@ -31,7 +31,7 @@ jobs:
         codeql database analyze db-v1.0.0-rc --format=sarif-latest --output=results-v1.0.0-rc.sarif
 
     - name: Upload SARIF Report
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: sarif-results-v1.0.0-rc
         path: results-v1.0.0-rc.sarif
