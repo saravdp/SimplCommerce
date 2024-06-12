@@ -35,7 +35,7 @@ jobs:
 
     - name: Build the code
       run: |
-        # sudo dotnet tool install --global dotnet-ef
+        sudo dotnet tool install --global dotnet-ef
         # sudo bash simpl-build.sh
         # cd src/SimplCommerce.WebHost
         # sudo apt-get install -y dotnet-sdk-8.0
