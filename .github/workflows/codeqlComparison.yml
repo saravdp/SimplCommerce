@@ -1,0 +1,38 @@
+name: Compare CodeQL Results
+
+on:
+  workflow_run:
+    workflows: ["CodeQL Analysis for Tag v1.0.0-rc", "CodeQL Analysis for Revision 930a233"]
+    types:
+      - completed
+
+jobs:
+  compare:
+    name: Compare CodeQL Analysis Results
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Download SARIF Reports
+      uses: actions/download-artifact@v2
+      with:
+        name: sarif-results-v1.0.0-rc
+        path: ./results-v1.0.0-rc
+    - name: Download SARIF Reports
+      uses: actions/download-artifact@v2
+      with:
+        name: sarif-results-930a233
+        path: ./results-930a233
+
+    - name: Compare SARIF Reports
+      run: |
+        npm install -g sarif
+        sarif diff ./results-v1.0.0-rc/results-v1.0.0-rc.sarif ./results-930a233/results-930a233.sarif > sarif-diff.txt
+
+    - name: Upload Comparison Report
+      uses: actions/upload-artifact@v2
+      with:
+        name: sarif-diff
+        path: sarif-diff.txt
