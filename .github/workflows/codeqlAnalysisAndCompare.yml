@@ -28,9 +28,6 @@ jobs:
     - name: Install npm dependencies
       run: npm install
       
-    - name: Install Gulp depencencies
-      run: npm install gulp
-      
     - name: Set up CodeQL
       uses: github/codeql-action/init@v2
       with:
@@ -67,9 +64,6 @@ jobs:
 
     - name: Install npm dependencies
       run: npm install
-      
-    - name: Install Gulp depencencies
-      run: npm install gulp
       
     - name: Set up CodeQL
       uses: github/codeql-action/init@v2
