@@ -9,56 +9,40 @@ on:
 jobs:
   codeql-analysis:
     name: CodeQL Analysis
-    strategy:
-      fail-fast: false
-      matrix:
-        language: ['go', 'javascript-typescript'] # Add more languages as needed
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      
+
       - name: Initialize submodules
         run: git submodule update --init --recursive
-      
+
       - name: Set up .NET
         uses: actions/setup-dotnet@v2
         with:
-          dotnet-version: '8.x'
-      
+          dotnet-version: '6.0.x' # Update to the appropriate .NET version if needed
+
       - name: Install Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '16.x'
-      
-      - name: Install dotnet dependencies
-        run: dotnet tool install --global dotnet-ef
-      
-      - name: Check PATH environment variable
-        run: echo $PATH
-            
-      # - name: Update database
-      #   run: ~/.dotnet/tools/dotnet-ef database update --project src/SimplCommerce.WebHost
-      
-      # - name: Run gulp tasks
-      #   run: npm run gulp-copy-modules -- --configurationName Release
-      
-      - name: Restore dependencies
-        run: dotnet restore SimplCommerce.sln
-      
-      - name: Build the code
-        run: dotnet build SimplCommerce.sln --configuration Release
-      
-      # - name: Update database
-      #   run: dotnet ef database update --project src/SimplCommerce.WebHost
-      
-      - name: Set up CodeQL
+
+      - name: Install CodeQL CLI
         uses: github/codeql-action/init@v2
         with:
-          languages: csharp
-      
+          languages: csharp # Specify that we're analyzing C# code
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
         with:
           upload: true
 
+  compare-results:
+    name: Compare CodeQL Analysis Results
+    runs-on: ubuntu-latest
+    needs: codeql-analysis
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Add steps for downloading and comparing SARIF reports here
