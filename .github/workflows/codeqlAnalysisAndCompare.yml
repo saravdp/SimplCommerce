@@ -19,8 +19,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
-           fetch-depth: 0  # Fetch all tags and history
-          
+          fetch-depth: 0  # Fetch all tags and history
+
       - name: Add upstream remote
         run: git remote add upstream https://github.com/simplcommerce/SimplCommerce.git
 
@@ -29,7 +29,7 @@ jobs:
 
       - name: Checkout specific tag
         run: git checkout tags/v1.0.0-rc
-     
+
       - name: Initialize submodules
         run: git submodule update --init --recursive
 
@@ -57,6 +57,17 @@ jobs:
 
       - name: Check SQL Server container logs
         run: docker logs sqlserver
+
+      - name: Install Gulp globally
+        run: npm install --global gulp-cli
+
+      - name: Install Node.js dependencies
+        run: npm install
+        working-directory: src/SimplCommerce.WebHost
+
+      - name: Run Gulp tasks
+        run: npm run gulp-copy-modules -- --configurationName Release
+        working-directory: src/SimplCommerce.WebHost
 
       - name: Set up CodeQL
         uses: github/codeql-action/init@v2
