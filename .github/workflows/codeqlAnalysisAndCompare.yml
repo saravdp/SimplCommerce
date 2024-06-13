@@ -47,11 +47,6 @@ jobs:
       - name: Check SQL Server container logs
         run: docker logs sqlserver
 
-      - name: Set up CodeQL
-        uses: github/codeql-action/init@v2
-        with:
-          languages: csharp
-
       - name: Restore dependencies
         run: dotnet restore SimplCommerce.sln
 
@@ -63,5 +58,18 @@ jobs:
           ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=YourDatabase;User Id=sa;Password=Your_password123;TrustServerCertificate=True;"
         run: dotnet ef database update --project src/SimplCommerce.WebHost
 
+      - name: Set up CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: csharp
+
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v2
+        with:
+          # Explicitly set the CodeQL tools version to match the nightly build.
+          tools: https://github.com/dsp-testing/codeql-cli-nightlies/releases/download/codeql-bundle-20240307/codeql-bundle-linux64.tar.gz
+          
+      - name: Upload SARIF result
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: results.qsarif
