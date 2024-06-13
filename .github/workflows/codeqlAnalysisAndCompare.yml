@@ -65,9 +65,9 @@ jobs:
         run: npm install
         working-directory: src/SimplCommerce.WebHost
 
-      - name: Run Gulp tasks
-        run: npm run gulp-copy-modules -- --configurationName Release
-        working-directory: src/SimplCommerce.WebHost
+      #- name: Run Gulp tasks
+      # run: npm run gulp-copy-modules -- --configurationName Release
+      #  working-directory: src/SimplCommerce.WebHost
 
       - name: Set up CodeQL
         uses: github/codeql-action/init@v2
